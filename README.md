@@ -14,7 +14,7 @@ Network discovery for [Mirror](https://github.com/vis2k/Mirror).
 
 - Single-threaded.
 
-- Tested on: Linux, Windows, 
+- Tested on: Linux, Windows, Android.
 
 - TODO: can lookup specific servers on the internet (outside of local network).
 
@@ -51,4 +51,8 @@ NetworkDiscovery.RegisterResponseData("Game mode", "Deathmatch");
 
 For more details on how to use it, check out NetworkDiscoveryHUD script.
 
+
+## Inspector
+
+![](/NetworkDiscoveryInInspector.png)
 
