@@ -110,7 +110,7 @@ namespace Mirror
 
             // assign address and port
             NetworkManager.singleton.networkAddress = info.EndPoint.Address.ToString();
-            ((TelepathyTransport) Transport.activeTransport).port = (ushort) info.KeyValuePairs[NetworkDiscovery.kPortKey];
+            ((TelepathyTransport) Transport.activeTransport).port = ushort.Parse( info.KeyValuePairs[NetworkDiscovery.kPortKey] );
 
             NetworkManager.singleton.StartClient();
         }
