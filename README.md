@@ -1,7 +1,7 @@
 
 ## MirrorNetworkDiscovery
 
-Network discovery for Mirror.
+Network discovery for [Mirror](https://github.com/vis2k/Mirror).
 
 
 ## Features
@@ -10,7 +10,7 @@ Network discovery for Mirror.
 
 - Uses C#'s UDP sockets for broadcasting and sending responses.
 
-- Independent of current transport. Although, NetworkDiscoveryHUD (example GUI) works only with Telepathy.
+- Independent of current transport. Although, [NetworkDiscoveryHUD](/NetworkDiscoveryHUD.cs) (example GUI) works only with Telepathy.
 
 - Single-threaded.
 
@@ -18,7 +18,7 @@ Network discovery for Mirror.
 
 - TODO: can lookup specific servers on the internet (outside of local network).
 
-- Has a separate GUI script for easy testing.
+- Has a separate [GUI script](/NetworkDiscoveryHUD.cs) for easy testing.
 
 - Has support for custom response data.
 
@@ -29,9 +29,9 @@ Network discovery for Mirror.
 
 ## Usage
 
-Attach NetworkDiscovery script to NetworkManager's game object. Assign game server port number.
+Attach [NetworkDiscovery](/NetworkDiscovery.cs) script to NetworkManager's game object. Assign game server port number.
 
-Now, you can use NetworkDiscoveryHUD script to test it (by attaching it to NetworkManager), or use the API directly:
+Now, you can use [NetworkDiscoveryHUD](/NetworkDiscoveryHUD.cs) script to test it (by attaching it to NetworkManager), or use the API directly:
 
 ```cs
 // register listener
