@@ -12,6 +12,7 @@ namespace Mirror
         string[] m_headerNames = new string[]{"IP", NetworkDiscovery.kMapNameKey, NetworkDiscovery.kNumPlayersKey, 
             NetworkDiscovery.kMaxNumPlayersKey};
         Vector2 m_scrollViewPos = Vector2.zero;
+        bool m_isRefreshing = false;
 
         public int offsetX = 5;
         public int offsetY = 150;
@@ -48,9 +49,16 @@ namespace Mirror
 
             GUILayout.BeginArea(new Rect(offsetX, offsetY, width, height));
 
-            if (GUILayout.Button("Refresh LAN", GUILayout.Height(25), GUILayout.ExpandWidth(false)))
+            if(m_isRefreshing)
             {
-                Refresh();
+                GUILayout.Button("Refreshing...", GUILayout.Height(25), GUILayout.ExpandWidth(false));
+            }
+            else
+            {
+                if (GUILayout.Button("Refresh LAN", GUILayout.Height(25), GUILayout.ExpandWidth(false)))
+                {
+                    Refresh();
+                }
             }
 
             GUILayout.Label(string.Format("Servers [{0}]:", m_discoveredServers.Count));
@@ -117,13 +125,21 @@ namespace Mirror
 
         IEnumerator RefreshCoroutine()
         {
+            m_isRefreshing = true;
             yield return null;
-            NetworkDiscovery.SendBroadcast();
+            try {
+                NetworkDiscovery.SendBroadcast();
+            } catch (System.Exception ex) {
+                Debug.LogException(ex);
+            }
             yield return new WaitForSecondsRealtime(refreshInterval);
+            m_isRefreshing = false;
         }
 
         void OnDiscoveredServer(NetworkDiscovery.DiscoveryInfo info)
         {
+            if (!m_isRefreshing)
+                return;
             m_discoveredServers.Add(info);
         }
 
