@@ -158,6 +158,7 @@ namespace Mirror
 
 			m_serverUdpCl = new UdpClient (singleton.m_serverPort);
 			RunSafe( () => { m_serverUdpCl.EnableBroadcast = true; } );
+			RunSafe( () => { m_serverUdpCl.MulticastLoopback = false; } );
 
 		//	m_serverUdpCl.BeginReceive(new System.AsyncCallback(ReceiveCallback), null);
 
