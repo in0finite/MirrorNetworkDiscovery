@@ -140,7 +140,21 @@ namespace Mirror
         {
             if (!m_isRefreshing)
                 return;
-            m_discoveredServers.Add(info);
+
+            int index = m_discoveredServers.FindIndex(item => item.EndPoint.Equals(info.EndPoint));
+            if(index < 0)
+            {
+                // server is not in the list
+                // add it
+                m_discoveredServers.Add(info);
+            }
+            else
+            {
+                // server is in the list
+                // update it
+                m_discoveredServers[index] = info;
+            }
+
         }
 
     }
