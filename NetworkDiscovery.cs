@@ -294,7 +294,37 @@ namespace Mirror
 
 		}
 
+
+		public static byte[] GetDiscoveryRequestData()
+		{
+			Profiler.BeginSample("ConvertDictionaryToByteArray");
+			var dict = new Dictionary<string, string>() {{kSignatureKey, GetSignature()}};
+			byte[] buffer = ConvertDictionaryToByteArray (dict);
+			Profiler.EndSample();
+
+			return buffer;
+		}
+
 		public static void SendBroadcast()
+		{
+			if (!SupportedOnThisPlatform)
+				return;
+			
+			byte[] buffer = GetDiscoveryRequestData();
+
+			// TODO: data should be broadcasted to internal networks only ? e.g. those that start with 192
+
+			IPEndPoint endPoint = new IPEndPoint(IPAddress.Broadcast, singleton.m_serverPort);
+
+			SendDiscoveryRequest(endPoint, buffer);
+		}
+
+		public static void SendDiscoveryRequest(IPEndPoint endPoint)
+		{
+			SendDiscoveryRequest(endPoint, GetDiscoveryRequestData());
+		}
+
+		static void SendDiscoveryRequest(IPEndPoint endPoint, byte[] buffer)
 		{
 			if (!SupportedOnThisPlatform)
 				return;
@@ -304,16 +334,7 @@ namespace Mirror
 			if (null == m_clientUdpCl)
 				return;
 			
-			// TODO: data should be broadcasted to internal networks only ? e.g. those that start with 192
-
-
-			Profiler.BeginSample("ConvertDictionaryToByteArray");
-			var dict = new Dictionary<string, string>() {{kSignatureKey, GetSignature()}};
-			byte[] buffer = ConvertDictionaryToByteArray (dict);
-			Profiler.EndSample();
-
-			IPEndPoint endPoint = new IPEndPoint(IPAddress.Broadcast, singleton.m_serverPort);
-
+			
 			Profiler.BeginSample("UdpClient.Send");
 			try {
 				m_clientUdpCl.Send (buffer, buffer.Length, endPoint);
