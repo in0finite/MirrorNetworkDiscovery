@@ -312,11 +312,18 @@ namespace Mirror
 			
 			byte[] buffer = GetDiscoveryRequestData();
 
-			// TODO: data should be broadcasted to internal networks only ? e.g. those that start with 192
+			// We can't just send packet to 255.255.255.255 - the OS will only broadcast it to the network interface
+			// which the socket is bound to.
+			// We need to broadcast packet on every network interface.
 
-			IPEndPoint endPoint = new IPEndPoint(IPAddress.Broadcast, singleton.m_serverPort);
+			IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, singleton.m_serverPort);
 
-			SendDiscoveryRequest(endPoint, buffer);
+			foreach(var address in GetBroadcastAdresses())
+			{
+				endPoint.Address = address;
+				SendDiscoveryRequest(endPoint, buffer);
+			}
+			
 		}
 
 		public static void SendDiscoveryRequest(IPEndPoint endPoint)
@@ -349,6 +356,95 @@ namespace Mirror
 			}
 			Profiler.EndSample();
 
+		}
+
+
+		public static IPAddress[] GetBroadcastAdresses()
+		{
+			// try multiple methods - because some of them may fail on some devices, especially if IL2CPP comes into play
+
+			try
+			{
+				return GetBroadcastAdressesFromNetworkInterfaces();
+			}
+			catch
+			{
+				try
+				{
+					return GetBroadcastAdressesFromHostEntry();
+				}
+				catch
+				{
+					// all methods failed
+					// just use broadcast address
+					return new IPAddress[]{IPAddress.Broadcast};
+				}
+			}
+
+		}
+
+		static IPAddress[] GetBroadcastAdressesFromNetworkInterfaces()
+		{
+			List<IPAddress> ips = new List<IPAddress>();
+
+			var nifs = NetworkInterface.GetAllNetworkInterfaces()
+				.Where(nif => nif.OperationalStatus == OperationalStatus.Up)
+				.Where(nif => nif.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 || nif.NetworkInterfaceType == NetworkInterfaceType.Ethernet);
+
+			foreach (var nif in nifs)
+			{
+				foreach (UnicastIPAddressInformation ipInfo in nif.GetIPProperties().UnicastAddresses)
+				{
+					var ip = ipInfo.Address;
+					if (ip.AddressFamily == AddressFamily.InterNetwork)
+					{
+						if(ToBroadcastAddress(ref ip))
+							ips.Add(ip);
+					}
+				}
+			}
+
+			return ips.ToArray();
+		}
+
+		static IPAddress[] GetBroadcastAdressesFromHostEntry()
+		{
+			var ips = new List<IPAddress> ();
+
+			IPHostEntry hostEntry = Dns.GetHostEntry(Dns.GetHostName());
+
+			foreach(var address in hostEntry.AddressList)
+			{
+				if (address.AddressFamily == AddressFamily.InterNetwork)
+				{
+					// this is IPv4 address
+					// convert it to broadcast address
+					if (ToBroadcastAddress(ref address))
+						ips.Add( address );
+				}
+			}
+
+			return ips.ToArray();
+		}
+
+		static bool ToBroadcastAddress(ref IPAddress ip)
+		{
+			if (ip.AddressFamily != AddressFamily.InterNetwork)
+				return false;
+			
+			byte[] bytes = ip.GetAddressBytes();
+			byte firstByte = bytes[0];
+
+			if (firstByte >= 0 && firstByte <= 127)
+				ip = new IPAddress(bytes[0], 255, 255, 255);
+			else if (firstByte >= 128 && firstByte <= 191)
+				ip = new IPAddress(bytes[0], bytes[1], 255, 255);
+			else if (firstByte >= 192 && firstByte <= 223)
+				ip = new IPAddress(bytes[0], bytes[1], bytes[2], 255);
+			else
+				return false;
+
+			return true;
 		}
 
 
