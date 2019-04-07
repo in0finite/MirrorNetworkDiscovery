@@ -10,16 +10,19 @@ namespace Mirror
     public class NetworkDiscoveryHUD : MonoBehaviour
     {
         List<NetworkDiscovery.DiscoveryInfo> m_discoveredServers = new List<NetworkDiscovery.DiscoveryInfo>();
-        Coroutine m_coroutine;
         string[] m_headerNames = new string[]{"IP", NetworkDiscovery.kMapNameKey, NetworkDiscovery.kNumPlayersKey, 
             NetworkDiscovery.kMaxNumPlayersKey};
         Vector2 m_scrollViewPos = Vector2.zero;
-        bool m_isRefreshing = false;
+        bool IsRefreshing { get { return Time.realtimeSinceStartup - m_timeWhenRefreshed < this.refreshInterval; } }
+        float m_timeWhenRefreshed = 0f;
         bool m_displayBroadcastAddresses = false;
 
         IPEndPoint m_lookupServer = null;   // server that we are currently looking up
         string m_lookupServerIP = "";
         string m_lookupServerPort = NetworkDiscovery.kDefaultServerPort.ToString();
+        float m_timeWhenLookedUpServer = 0f;
+        bool IsLookingUpAnyServer { get { return Time.realtimeSinceStartup - m_timeWhenLookedUpServer < this.refreshInterval
+                                            && m_lookupServer != null; } }
 
         public int offsetX = 5;
         public int offsetY = 150;
@@ -56,7 +59,7 @@ namespace Mirror
 
             GUILayout.BeginArea(new Rect(offsetX, offsetY, width, height));
 
-            if(m_isRefreshing)
+            if(IsRefreshing)
             {
                 GUILayout.Button("Refreshing...", GUILayout.Height(25), GUILayout.ExpandWidth(false));
             }
@@ -116,8 +119,15 @@ namespace Mirror
             m_lookupServerIP = GUILayout.TextField(m_lookupServerIP);
             GUILayout.Label("Port:");
             m_lookupServerPort = GUILayout.TextField(m_lookupServerPort);
-            if (GUILayout.Button("Lookup"))
-                LookupServer();
+            if (IsLookingUpAnyServer)
+            {
+                GUILayout.Button("Lookup...");
+            }
+            else
+            {
+                if (GUILayout.Button("Lookup"))
+                    LookupServer();
+            }
             GUILayout.EndHorizontal();
 
 
@@ -128,9 +138,11 @@ namespace Mirror
         void Refresh()
         {
             m_discoveredServers.Clear();
-            if(m_coroutine != null)
-                StopCoroutine(m_coroutine);
-            m_coroutine = StartCoroutine(RefreshCoroutine());
+
+            m_timeWhenRefreshed = Time.realtimeSinceStartup;
+
+            NetworkDiscovery.SendBroadcast();
+            
         }
 
         void LookupServer()
@@ -143,9 +155,18 @@ namespace Mirror
             // input is ok
             // send discovery request
 
+            m_timeWhenLookedUpServer = Time.realtimeSinceStartup;
+
             m_lookupServer = new IPEndPoint(ip, port);
 
             NetworkDiscovery.SendDiscoveryRequest(m_lookupServer);
+        }
+
+        bool IsLookingUpServer(IPEndPoint endPoint)
+        {
+            return Time.realtimeSinceStartup - m_timeWhenLookedUpServer < this.refreshInterval 
+                && m_lookupServer != null 
+                && m_lookupServer.Equals(endPoint);
         }
 
         void Connect(NetworkDiscovery.DiscoveryInfo info)
@@ -167,22 +188,9 @@ namespace Mirror
             NetworkManager.singleton.StartClient();
         }
 
-        IEnumerator RefreshCoroutine()
-        {
-            m_isRefreshing = true;
-            yield return null;
-            try {
-                NetworkDiscovery.SendBroadcast();
-            } catch (System.Exception ex) {
-                Debug.LogException(ex);
-            }
-            yield return new WaitForSecondsRealtime(refreshInterval);
-            m_isRefreshing = false;
-        }
-
         void OnDiscoveredServer(NetworkDiscovery.DiscoveryInfo info)
         {
-            if (!m_isRefreshing && (null == m_lookupServer || !m_lookupServer.Equals(info.EndPoint)))
+            if (!IsRefreshing && !IsLookingUpServer(info.EndPoint))
                 return;
 
             int index = m_discoveredServers.FindIndex(item => item.EndPoint.Equals(info.EndPoint));
