@@ -71,8 +71,30 @@ namespace Mirror
                 }
             }
 
+            // lookup a server
+
+            GUILayout.Label("Lookup server: ");
             GUILayout.BeginHorizontal();
-            m_displayBroadcastAddresses = GUILayout.Toggle(m_displayBroadcastAddresses, "Display broadcast addresses");
+            GUILayout.Label("IP:");
+            m_lookupServerIP = GUILayout.TextField(m_lookupServerIP, GUILayout.Width(120));
+            GUILayout.Space(10);
+            GUILayout.Label("Port:");
+            m_lookupServerPort = GUILayout.TextField(m_lookupServerPort, GUILayout.Width(60));
+            GUILayout.Space(10);
+            if (IsLookingUpAnyServer)
+            {
+                GUILayout.Button("Lookup...", GUILayout.Height(25), GUILayout.MinWidth(80));
+            }
+            else
+            {
+                if (GUILayout.Button("Lookup", GUILayout.Height(25), GUILayout.MinWidth(80)))
+                    LookupServer();
+            }
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            m_displayBroadcastAddresses = GUILayout.Toggle(m_displayBroadcastAddresses, "Display broadcast addresses", GUILayout.ExpandWidth(false));
             if (m_displayBroadcastAddresses)
             {
                 GUILayout.Space(10);
@@ -89,6 +111,7 @@ namespace Mirror
             GUILayout.EndHorizontal();
 
             // servers
+
             m_scrollViewPos = GUILayout.BeginScrollView(m_scrollViewPos);
 
             foreach(var info in m_discoveredServers)
@@ -110,25 +133,6 @@ namespace Mirror
             }
 
             GUILayout.EndScrollView();
-
-            // lookup a server
-
-            GUILayout.Label("Lookup server: ");
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("IP:");
-            m_lookupServerIP = GUILayout.TextField(m_lookupServerIP);
-            GUILayout.Label("Port:");
-            m_lookupServerPort = GUILayout.TextField(m_lookupServerPort);
-            if (IsLookingUpAnyServer)
-            {
-                GUILayout.Button("Lookup...");
-            }
-            else
-            {
-                if (GUILayout.Button("Lookup"))
-                    LookupServer();
-            }
-            GUILayout.EndHorizontal();
 
 
             GUILayout.EndArea();
