@@ -38,9 +38,11 @@ namespace Mirror
 
 		public const string kSignatureKey = "Signature", kPortKey = "Port", kNumPlayersKey = "Players", 
 			kMaxNumPlayersKey = "MaxNumPlayers", kMapNameKey = "Map";
+		
+		public const int kDefaultServerPort = 18418;
 
 	//	[SerializeField] int m_clientPort = 18417;
-		[SerializeField] int m_serverPort = 18418;
+		[SerializeField] int m_serverPort = kDefaultServerPort;
 		static UdpClient m_serverUdpCl = null;
 		static UdpClient m_clientUdpCl = null;
 

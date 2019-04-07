@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System.Net;
 
 namespace Mirror
 {
@@ -15,6 +16,10 @@ namespace Mirror
         Vector2 m_scrollViewPos = Vector2.zero;
         bool m_isRefreshing = false;
         bool m_displayBroadcastAddresses = false;
+
+        IPEndPoint m_lookupServer = null;   // server that we are currently looking up
+        string m_lookupServerIP = "";
+        string m_lookupServerPort = NetworkDiscovery.kDefaultServerPort.ToString();
 
         public int offsetX = 5;
         public int offsetY = 150;
@@ -103,6 +108,19 @@ namespace Mirror
 
             GUILayout.EndScrollView();
 
+            // lookup a server
+
+            GUILayout.Label("Lookup server: ");
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("IP:");
+            m_lookupServerIP = GUILayout.TextField(m_lookupServerIP);
+            GUILayout.Label("Port:");
+            m_lookupServerPort = GUILayout.TextField(m_lookupServerPort);
+            if (GUILayout.Button("Lookup"))
+                LookupServer();
+            GUILayout.EndHorizontal();
+
+
             GUILayout.EndArea();
 
         }
@@ -113,6 +131,21 @@ namespace Mirror
             if(m_coroutine != null)
                 StopCoroutine(m_coroutine);
             m_coroutine = StartCoroutine(RefreshCoroutine());
+        }
+
+        void LookupServer()
+        {
+            // parse IP and port
+
+            IPAddress ip = IPAddress.Parse(m_lookupServerIP);
+            ushort port = ushort.Parse(m_lookupServerPort);
+
+            // input is ok
+            // send discovery request
+
+            m_lookupServer = new IPEndPoint(ip, port);
+
+            NetworkDiscovery.SendDiscoveryRequest(m_lookupServer);
         }
 
         void Connect(NetworkDiscovery.DiscoveryInfo info)
@@ -149,7 +182,7 @@ namespace Mirror
 
         void OnDiscoveredServer(NetworkDiscovery.DiscoveryInfo info)
         {
-            if (!m_isRefreshing)
+            if (!m_isRefreshing && (null == m_lookupServer || !m_lookupServer.Equals(info.EndPoint)))
                 return;
 
             int index = m_discoveredServers.FindIndex(item => item.EndPoint.Equals(info.EndPoint));
