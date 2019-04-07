@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Net.NetworkInformation;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine.Profiling;
 
@@ -398,7 +399,7 @@ namespace Mirror
 					var ip = ipInfo.Address;
 					if (ip.AddressFamily == AddressFamily.InterNetwork)
 					{
-						if(ToBroadcastAddress(ref ip))
+						if(ToBroadcastAddress(ref ip, ipInfo.IPv4Mask))
 							ips.Add(ip);
 					}
 				}
@@ -419,32 +420,61 @@ namespace Mirror
 				{
 					// this is IPv4 address
 					// convert it to broadcast address
-					if (ToBroadcastAddress(ref address))
-						ips.Add( address );
+					// use default subnet
+
+					var subnetMask = GetDefaultSubnetMask(address);
+					if (subnetMask != null)
+					{
+						var broadcastAddress = address;
+						if (ToBroadcastAddress(ref broadcastAddress, subnetMask))
+							ips.Add( broadcastAddress );
+					}
 				}
 			}
 
 			return ips.ToArray();
 		}
 
-		static bool ToBroadcastAddress(ref IPAddress ip)
+		static bool ToBroadcastAddress(ref IPAddress ip, IPAddress subnetMask)
 		{
-			if (ip.AddressFamily != AddressFamily.InterNetwork)
+			if (ip.AddressFamily != AddressFamily.InterNetwork || subnetMask.AddressFamily != AddressFamily.InterNetwork)
 				return false;
 			
+			byte[] bytes = ip.GetAddressBytes();
+			byte[] subnetMaskBytes = subnetMask.GetAddressBytes();
+
+			for(int i=0; i < 4; i++)
+			{
+				// on places where subnet mask has 1s, address bits are copied,
+				// and on places where subnet mask has 0s, address bits are 1
+				bytes[i] = (byte) ((~subnetMaskBytes[i]) | bytes[i]);
+			}
+
+			ip = new IPAddress(bytes);
+
+			return true;
+		}
+
+		static IPAddress GetDefaultSubnetMask(IPAddress ip)
+		{
+			if (ip.AddressFamily != AddressFamily.InterNetwork)
+				return null;
+
+			IPAddress subnetMask;
+
 			byte[] bytes = ip.GetAddressBytes();
 			byte firstByte = bytes[0];
 
 			if (firstByte >= 0 && firstByte <= 127)
-				ip = new IPAddress(bytes[0], 255, 255, 255);
+				subnetMask = new IPAddress(new byte[]{255, 0, 0, 0});
 			else if (firstByte >= 128 && firstByte <= 191)
-				ip = new IPAddress(bytes[0], bytes[1], 255, 255);
+				subnetMask = new IPAddress(new byte[]{255, 255, 0, 0});
 			else if (firstByte >= 192 && firstByte <= 223)
-				ip = new IPAddress(bytes[0], bytes[1], bytes[2], 255);
-			else
-				return false;
+				subnetMask = new IPAddress(new byte[]{255, 255, 255, 0});
+			else // undefined subnet
+				subnetMask = null;
 
-			return true;
+			return subnetMask;
 		}
 
 
