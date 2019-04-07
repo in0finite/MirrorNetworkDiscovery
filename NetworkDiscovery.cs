@@ -176,8 +176,6 @@ namespace Mirror
 			// turn off receiving from our IP
 			RunSafe( () => { m_clientUdpCl.MulticastLoopback = false; } );
 
-		//	m_clientUdpCl.JoinMulticastGroup (IPAddress.Parse("127.0.0.1"));
-
 		}
 
 		static void ShutdownUdpClients()

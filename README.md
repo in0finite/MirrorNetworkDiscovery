@@ -70,7 +70,7 @@ For more details on how to use it, check out NetworkDiscoveryHUD script.
 
 - Measure ping - requires that all socket operations are done in a separate thread, or using async methods
 
-- Prevent duplicates in GUI
-
 - Add "Refresh" button in GUI next to each server
+
+- Prevent detection of multiple localhost servers (by assigning GUID to each packet) ?
 
