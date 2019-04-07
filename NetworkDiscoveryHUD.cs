@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 namespace Mirror
 {
@@ -13,6 +14,7 @@ namespace Mirror
             NetworkDiscovery.kMaxNumPlayersKey};
         Vector2 m_scrollViewPos = Vector2.zero;
         bool m_isRefreshing = false;
+        bool m_displayBroadcastAddresses = false;
 
         public int offsetX = 5;
         public int offsetY = 150;
@@ -60,6 +62,15 @@ namespace Mirror
                     Refresh();
                 }
             }
+
+            GUILayout.BeginHorizontal();
+            m_displayBroadcastAddresses = GUILayout.Toggle(m_displayBroadcastAddresses, "Display broadcast addresses");
+            if (m_displayBroadcastAddresses)
+            {
+                GUILayout.Space(10);
+                GUILayout.Label( string.Join( ", ", NetworkDiscovery.GetBroadcastAdresses().Select(ip => ip.ToString()) ) );
+            }
+            GUILayout.EndHorizontal();
 
             GUILayout.Label(string.Format("Servers [{0}]:", m_discoveredServers.Count));
 
