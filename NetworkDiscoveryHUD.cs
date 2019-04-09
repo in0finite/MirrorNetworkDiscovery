@@ -24,6 +24,8 @@ namespace Mirror
         bool IsLookingUpAnyServer { get { return Time.realtimeSinceStartup - m_timeWhenLookedUpServer < this.refreshInterval
                                             && m_lookupServer != null; } }
 
+        GUIStyle m_centeredLabelStyle;
+
         public int offsetX = 5;
         public int offsetY = 150;
         public int width = 500, height = 400;
@@ -54,6 +56,12 @@ namespace Mirror
                 return;
             if (!NetworkDiscovery.SupportedOnThisPlatform)
                 return;
+
+            if (null == m_centeredLabelStyle)
+            {
+                m_centeredLabelStyle = new GUIStyle(GUI.skin.label);
+                m_centeredLabelStyle.alignment = TextAnchor.MiddleCenter;
+            }
 
             int elemWidth = width / m_headerNames.Length - 5;
 
@@ -124,9 +132,9 @@ namespace Mirror
                 for( int i = 1; i < m_headerNames.Length; i++ )
                 {
                     if (info.KeyValuePairs.ContainsKey(m_headerNames[i]))
-                        GUILayout.Label(info.KeyValuePairs[m_headerNames[i]], GUILayout.Width(elemWidth));
+                        GUILayout.Label(info.KeyValuePairs[m_headerNames[i]], m_centeredLabelStyle, GUILayout.Width(elemWidth));
                     else
-                        GUILayout.Label("", GUILayout.Width(elemWidth));
+                        GUILayout.Label("", m_centeredLabelStyle, GUILayout.Width(elemWidth));
                 }
 
                 GUILayout.EndHorizontal();
