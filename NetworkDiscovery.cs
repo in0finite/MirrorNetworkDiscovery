@@ -364,24 +364,24 @@ namespace Mirror
 		{
 			// try multiple methods - because some of them may fail on some devices, especially if IL2CPP comes into play
 
-			try
-			{
-				return GetBroadcastAdressesFromNetworkInterfaces();
-			}
-			catch
-			{
-				try
-				{
-					return GetBroadcastAdressesFromHostEntry();
-				}
-				catch
-				{
-					// all methods failed
-					// just use broadcast address
-					return new IPAddress[]{IPAddress.Broadcast};
-				}
-			}
+			IPAddress[] ips = null;
 
+			RunSafe(() => ips = GetBroadcastAdressesFromNetworkInterfaces(), false);
+			
+			if (null == ips || ips.Length < 1)
+			{
+				// try another method
+				RunSafe(() => ips = GetBroadcastAdressesFromHostEntry(), false);
+			}
+			
+			if (null == ips || ips.Length < 1)
+			{
+				// all methods failed, or there is no network interface on this device
+				// just use full-broadcast address
+				ips = new IPAddress[]{IPAddress.Broadcast};
+			}
+			
+			return ips;
 		}
 
 		static IPAddress[] GetBroadcastAdressesFromNetworkInterfaces()
@@ -430,6 +430,13 @@ namespace Mirror
 							ips.Add( broadcastAddress );
 					}
 				}
+			}
+
+			if (ips.Count > 0)
+			{
+				// if we found at least 1 ip, then also add full-broadcast address
+				// this will compensate in case we used a wrong subnet mask
+				ips.Add(IPAddress.Broadcast);
 			}
 
 			return ips.ToArray();
@@ -582,7 +589,7 @@ namespace Mirror
 		}
 
 
-		static bool RunSafe(System.Action action)
+		static bool RunSafe(System.Action action, bool logException = true)
 		{
 			try
 			{
@@ -591,7 +598,8 @@ namespace Mirror
 			}
 			catch(System.Exception ex)
 			{
-				Debug.LogException(ex);
+				if (logException)
+					Debug.LogException(ex);
 				return false;
 			}
 		}

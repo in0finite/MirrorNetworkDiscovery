@@ -6,7 +6,7 @@ Network discovery for [Mirror](https://github.com/vis2k/Mirror).
 
 ## Features
 
-- Simple. 1 script. 450 lines of code.
+- Simple. 1 script. 600 lines of code.
 
 - Uses C#'s UDP sockets for broadcasting and sending responses.
 
@@ -16,7 +16,7 @@ Network discovery for [Mirror](https://github.com/vis2k/Mirror).
 
 - Tested on: Linux, Windows, Android.
 
-- TODO: can lookup specific servers on the internet (outside of local network).
+- Can lookup specific servers on the internet (outside of local network).
 
 - Has a separate [GUI script](/NetworkDiscoveryHUD.cs) for easy testing.
 
@@ -64,8 +64,6 @@ For more details on how to use it, check out NetworkDiscoveryHUD script.
 
 ## TODO
 
-- Lookup specific server on the internet
-
 - Don't try to start/stop server socket every frame, but only when server status changes
 
 - Measure ping - requires that all socket operations are done in a separate thread, or using async methods
@@ -73,4 +71,6 @@ For more details on how to use it, check out NetworkDiscoveryHUD script.
 - Add "Refresh" button in GUI next to each server
 
 - Prevent detection of multiple localhost servers (by assigning GUID to each packet) ?
+
+- Centered label ; join "Players" and "MaxNumPlayers" columns
 
