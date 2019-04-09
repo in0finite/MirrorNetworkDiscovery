@@ -68,9 +68,9 @@ For more details on how to use it, check out NetworkDiscoveryHUD script.
 
 - Measure ping - requires that all socket operations are done in a separate thread, or using async methods
 
-- Add "Refresh" button in GUI next to each server
-
 - Prevent detection of multiple localhost servers (by assigning GUID to each packet) ?
 
-- Centered label ; join "Players" and "MaxNumPlayers" columns
+- Add "Refresh" button in GUI next to each server
+
+- Join "Players" and "MaxNumPlayers" columns ?
 
