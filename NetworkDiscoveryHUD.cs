@@ -26,6 +26,7 @@ namespace Mirror
 
         GUIStyle m_centeredLabelStyle;
 
+        public bool drawGUI = true;
         public int offsetX = 5;
         public int offsetY = 150;
         public int width = 500, height = 400;
@@ -50,6 +51,12 @@ namespace Mirror
 
         void OnGUI()
         {
+            if (this.drawGUI)
+                this.Display(new Rect(offsetX, offsetY, width, height));
+        }
+
+        public void Display(Rect displayRect)
+        {
             if (null == NetworkManager.singleton)
                 return;
             if (NetworkServer.active || NetworkClient.active)
@@ -65,7 +72,7 @@ namespace Mirror
 
             int elemWidth = width / m_headerNames.Length - 5;
 
-            GUILayout.BeginArea(new Rect(offsetX, offsetY, width, height));
+            GUILayout.BeginArea(displayRect);
 
             if(IsRefreshing)
             {
