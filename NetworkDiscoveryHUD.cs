@@ -32,7 +32,14 @@ namespace Mirror
         public int width = 500, height = 400;
         [Range(1, 5)] public float refreshInterval = 3f;
 
+        public System.Action<NetworkDiscovery.DiscoveryInfo> connectAction;
 
+
+
+        NetworkDiscoveryHUD()
+        {
+            this.connectAction = this.Connect;
+        }
 
         void OnEnable()
         {
@@ -134,7 +141,7 @@ namespace Mirror
                 GUILayout.BeginHorizontal();
 
                 if( GUILayout.Button(info.EndPoint.Address.ToString(), GUILayout.Width(elemWidth)) )
-                    Connect(info);
+                    this.connectAction(info);
 
                 for( int i = 1; i < m_headerNames.Length; i++ )
                 {
