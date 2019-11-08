@@ -587,12 +587,26 @@ namespace Mirror
 
 		public static byte[] ConvertStringToPacketData(string str)
 		{
-			return System.Convert.FromBase64String(str);
+			byte[] data = new byte[str.Length * 2];
+			for (int i = 0; i < str.Length; i++)
+			{
+				ushort c = str[i];
+				data[i * 2] = (byte) ((c & 0xff00) >> 8);
+				data[i * 2 + 1] = (byte) (c & 0x00ff);
+			}
+			return data;
 		}
 
 		public static string ConvertPacketDataToString(byte[] data)
 		{
-			return System.Convert.ToBase64String(data);
+			char[] arr = new char[data.Length / 2];
+			for (int i = 0; i < arr.Length; i++)
+			{
+				ushort b1 = data[i * 2];
+				ushort b2 = data[i * 2 + 1];
+				arr[i] = (char)((b1 << 8) | b2);
+			}
+			return new string(arr);
 		}
 
 
