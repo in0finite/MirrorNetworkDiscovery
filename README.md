@@ -10,7 +10,7 @@ Network discovery for [Mirror](https://github.com/vis2k/Mirror).
 
 - Uses C#'s UDP sockets for broadcasting and sending responses.
 
-- Independent of current transport. Although, [NetworkDiscoveryHUD](/NetworkDiscoveryHUD.cs) (example GUI) works only with Telepathy.
+- Independent of current transport.
 
 - Single-threaded.
 
@@ -18,7 +18,7 @@ Network discovery for [Mirror](https://github.com/vis2k/Mirror).
 
 - Can lookup specific servers on the internet (outside of local network).
 
-- Has a separate [GUI script](/NetworkDiscoveryHUD.cs) for easy testing.
+- Has a separate [GUI script](/NetworkDiscoveryHUD.cs) for easy testing. This GUI can only connect to a server using Telepathy transport.
 
 - Has support for custom response data.
 
