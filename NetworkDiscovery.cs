@@ -234,7 +234,7 @@ namespace Mirror
 			while (true)
 			{
 
-				yield return new WaitForSecondsRealtime (0.3f);
+				yield return null;
 
 				if (null == m_serverUdpCl)
 					continue;
@@ -279,7 +279,7 @@ namespace Mirror
 
 			while (true)
 			{
-				yield return new WaitForSecondsRealtime (0.3f);
+				yield return null;
 
 				if (null == m_clientUdpCl)
 					continue;

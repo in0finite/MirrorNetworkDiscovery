@@ -76,7 +76,5 @@ For more details on how to use it, check out NetworkDiscoveryHUD script.
 
 - Catch the other exception which is thrown on windows - it's harmless, so it should not be logged
 
-- Don't wait 0.3 seconds before processing data - process it every frame
-
 - Use base64 instead of utf8 for encoding
 
