@@ -77,21 +77,9 @@ namespace Mirror
                 m_centeredLabelStyle.alignment = TextAnchor.MiddleCenter;
             }
 
-            int elemWidth = width / m_headerNames.Length - 5;
-
             GUILayout.BeginArea(displayRect);
 
-            if(IsRefreshing)
-            {
-                GUILayout.Button("Refreshing...", GUILayout.Height(25), GUILayout.ExpandWidth(false));
-            }
-            else
-            {
-                if (GUILayout.Button("Refresh LAN", GUILayout.Height(25), GUILayout.ExpandWidth(false)))
-                {
-                    Refresh();
-                }
-            }
+            this.DisplayRefreshButton();
 
             // lookup a server
 
@@ -126,6 +114,32 @@ namespace Mirror
 
             GUILayout.Label(string.Format("Servers [{0}]:", m_discoveredServers.Count));
 
+            this.DisplayServers();
+
+            GUILayout.EndArea();
+
+        }
+
+        public void DisplayRefreshButton()
+        {
+            if(IsRefreshing)
+            {
+                GUILayout.Button("Refreshing...", GUILayout.Height(25), GUILayout.ExpandWidth(false));
+            }
+            else
+            {
+                if (GUILayout.Button("Refresh LAN", GUILayout.Height(25), GUILayout.ExpandWidth(false)))
+                {
+                    Refresh();
+                }
+            }
+        }
+
+        public void DisplayServers()
+        {
+
+            int elemWidth = this.width / m_headerNames.Length - 5;
+
             // header
             GUILayout.BeginHorizontal();
             foreach(string str in m_headerNames)
@@ -155,9 +169,6 @@ namespace Mirror
             }
 
             GUILayout.EndScrollView();
-
-
-            GUILayout.EndArea();
 
         }
 
