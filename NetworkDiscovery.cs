@@ -580,12 +580,12 @@ namespace Mirror
 
 		public static byte[] ConvertStringToPacketData(string str)
 		{
-			return System.Text.Encoding.UTF8.GetBytes(str);
+			return System.Convert.FromBase64String(str);
 		}
 
 		public static string ConvertPacketDataToString(byte[] data)
 		{
-			return System.Text.Encoding.UTF8.GetString(data);
+			return System.Convert.ToBase64String(data);
 		}
 
 
