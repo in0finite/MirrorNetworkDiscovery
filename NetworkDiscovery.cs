@@ -50,6 +50,8 @@ namespace Mirror
 
 		static string m_signature = null;
 
+		static bool m_wasServerActiveLastTime = false;
+
 		public static bool SupportedOnThisPlatform { get { return Application.platform != RuntimePlatform.WebGLPlayer; } }
 
 		static bool IsServerActive { get { return NetworkServer.active; } }
@@ -139,15 +141,20 @@ namespace Mirror
 				UpdateResponseData ();
 			}
 
-			if(IsServerActive)
+			bool isServerActiveNow = IsServerActive;
+
+			if (isServerActiveNow != m_wasServerActiveLastTime)
 			{
-				// make sure server's UDP client is created
-				EnsureServerIsInitialized();
-			}
-			else
-			{
-				// we should close server's UDP client
-				CloseServerUdpClient();
+				// server status changed
+				// start/stop server's udp client
+
+				m_wasServerActiveLastTime = isServerActiveNow;
+
+				if (isServerActiveNow)
+					EnsureServerIsInitialized();
+				else
+					CloseServerUdpClient();
+				
 			}
 
 		}

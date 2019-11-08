@@ -64,8 +64,6 @@ For more details on how to use it, check out NetworkDiscoveryHUD script.
 
 ## TODO
 
-- Don't try to start/stop server socket every frame, but only when server status changes
-
 - Measure ping - requires that all socket operations are done in a separate thread, or using async methods
 
 - Prevent detection of multiple localhost servers (by assigning GUID to each packet) ?
