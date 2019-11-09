@@ -46,8 +46,6 @@ namespace Mirror
 		static UdpClient m_serverUdpCl = null;
 		static UdpClient m_clientUdpCl = null;
 
-		public bool simulateResponding = false;
-
 		static string m_signature = null;
 
 		static bool m_wasServerActiveLastTime = false;
@@ -80,54 +78,11 @@ namespace Mirror
 
 			StartCoroutine (ServerCoroutine ());
 
-			StartCoroutine (SimulateRespondingCoroutine ());
-
 		}
 
 		void OnDisable ()
 		{
 			ShutdownUdpClients ();
-		}
-
-
-		/// <summary>
-		/// Simulates responses from server.
-		/// </summary>
-		static System.Collections.IEnumerator SimulateRespondingCoroutine()
-		{
-
-			yield return new WaitForSecondsRealtime (4f);
-
-			// generate some random IPs
-			string[] ips = new string[15];
-			for (int i = 0; i < ips.Length; i++) {
-				string ip = Random.Range( 1, 255 ) + "." + Random.Range( 1, 255 ) + "." + Random.Range( 1, 255 ) + "." + Random.Range( 1, 255 ) ;
-				ips [i] = ip;
-			}
-
-			while (true) {
-
-				yield return null;
-
-				float pauseTime = Random.Range (0.1f, 0.7f);
-				yield return new WaitForSecondsRealtime (pauseTime);
-
-				if (!singleton.simulateResponding)
-					continue;
-
-				string ip = ips [Random.Range (0, ips.Length - 1)];
-
-				var dict = new Dictionary<string, string> () {
-					{ kSignatureKey, GetSignature() },
-					{ kPortKey, Random.Range (1, 65535).ToString () },
-					{ kNumPlayersKey, Random.Range (0, 20).ToString () },
-					{ kMaxNumPlayersKey, Random.Range (30, 100).ToString () },
-					{ kMapNameKey, "arena" }
-				};
-
-				OnReceivedServerResponse( new DiscoveryInfo( new IPEndPoint(IPAddress.Parse(ip), Random.Range (1, 65535)), dict ) );
-			}
-
 		}
 
 
