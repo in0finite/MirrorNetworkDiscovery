@@ -13,7 +13,7 @@ namespace Mirror
         string[] m_headerNames = new string[]{"IP", NetworkDiscovery.kMapNameKey, NetworkDiscovery.kNumPlayersKey, 
             NetworkDiscovery.kMaxNumPlayersKey};
         Vector2 m_scrollViewPos = Vector2.zero;
-        bool IsRefreshing { get { return Time.realtimeSinceStartup - m_timeWhenRefreshed < this.refreshInterval; } }
+        public bool IsRefreshing { get { return Time.realtimeSinceStartup - m_timeWhenRefreshed < this.refreshInterval; } }
         float m_timeWhenRefreshed = 0f;
         bool m_displayBroadcastAddresses = false;
 
@@ -58,8 +58,16 @@ namespace Mirror
 
         void OnGUI()
         {
+            
+            if (null == m_centeredLabelStyle)
+            {
+                m_centeredLabelStyle = new GUIStyle(GUI.skin.label);
+                m_centeredLabelStyle.alignment = TextAnchor.MiddleCenter;
+            }
+
             if (this.drawGUI)
                 this.Display(new Rect(offsetX, offsetY, width, height));
+            
         }
 
         public void Display(Rect displayRect)
@@ -70,12 +78,6 @@ namespace Mirror
                 return;
             if (!NetworkDiscovery.SupportedOnThisPlatform)
                 return;
-
-            if (null == m_centeredLabelStyle)
-            {
-                m_centeredLabelStyle = new GUIStyle(GUI.skin.label);
-                m_centeredLabelStyle.alignment = TextAnchor.MiddleCenter;
-            }
 
             GUILayout.BeginArea(displayRect);
 
@@ -172,7 +174,7 @@ namespace Mirror
 
         }
 
-        void Refresh()
+        public void Refresh()
         {
             m_discoveredServers.Clear();
 
@@ -182,7 +184,7 @@ namespace Mirror
             
         }
 
-        void LookupServer()
+        public void LookupServer()
         {
             // parse IP and port
 

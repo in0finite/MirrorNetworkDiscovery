@@ -76,3 +76,5 @@ For more details on how to use it, check out NetworkDiscoveryHUD script.
 
 - Remove test coroutine
 
+- Add option to allow different application versions
+
