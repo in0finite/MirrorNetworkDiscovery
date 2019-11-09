@@ -496,7 +496,7 @@ namespace Mirror
 			if (m_signature != null)
 				return m_signature;
 			
-			string[] strings = new string[]{ Application.companyName, Application.productName, Application.version, 
+			string[] strings = new string[]{ Application.companyName, Application.productName, 
 				Application.unityVersion };
 
 			m_signature = "";
