@@ -74,3 +74,5 @@ For more details on how to use it, check out NetworkDiscoveryHUD script.
 
 - Catch the other exception which is thrown on windows - it's harmless, so it should not be logged
 
+- Make sure packet-to-string conversion works with non-ascii characters
+
